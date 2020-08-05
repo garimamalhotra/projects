@@ -81,7 +81,8 @@ def homepage():
     script, div = components(p)
 
     #Give some text for the bottom of the page 
-    example_string = 'Example web app built using python, Flask, and Bokeh.'
+    #example_string = 'Example web app built using python, Flask, and Bokeh.'
+    example_string = 'Built using python, Flask, and Bokeh.'
 
     #Render the page
     return render_template('home.html', script=script, div=div, example_string=example_string)    
