@@ -16,19 +16,18 @@ from flask import Flask, render_template
 #Connect the app
 app = Flask(__name__)
 
-
 def get_plot():
     TOOLS = 'crosshair,save,pan,box_zoom,reset,wheel_zoom'
     p = figure(title="Employees on Linkedin through Time", y_axis_type="log",x_axis_type='datetime', tools = TOOLS)
 
     #Selecting Apple for this EDA since it has largest number of followers and employees on linkedin
     df_select=pd.read_csv('df_common.csv')
+    df_select['as_of_date']=pd.to_datetime(df_select['as_of_date'])
     common_companies=df_select.company_name.unique()
     df_comp=df_select[df_select['company_name']=='Apple']
-    print(df_comp)
-    df_comp=df_comp.sort_values(by='as_of_date')
 
-    source = ColumnDataSource(data={'x': df_comp['as_of_date'], 'y': df_comp['employees_on_platform']})
+    df_comp=df_comp.sort_values(by='as_of_date')
+    source = ColumnDataSource(data={'x': df_comp['as_of_date'].values, 'y': df_comp['employees_on_platform'].values})
     source2 = ColumnDataSource(data={'x': df_comp['as_of_date'], 'y': df_comp['followers_count']})
 
     #p.line(df_comp['as_of_date'], df_comp['employees_on_platform'], legend=icomp, line_color="purple", line_width = 3)
@@ -38,7 +37,6 @@ def get_plot():
     p.add_tools(HoverTool(show_arrow=False, line_policy='next', tooltips=\
                           [('Date', '@x{%F}'),('Employees', '@y')],\
                          formatters={'@x': 'datetime'}))
-    p.plot_width =800
 
     def callback(attr, old, new):
         df_comp=df_select[df_select['company_name']==new]
@@ -53,20 +51,22 @@ def get_plot():
     menu= Select(options=list(common_companies), value='Apple', title='Distribution')
     menu.on_change('value', callback) 
 
+
     curdoc().add_root(column(menu, p))
+
     curdoc().theme = Theme(json=yaml.load("""
         attrs:
             Figure:
-                background_fill_color: "#DDDDDD"
+                background_fill_color: "white"
                 outline_line_color: white
                 toolbar_location: above
                 height: 500
-                width: 800
+                width: 900
             Grid:
                 grid_line_dash: [6, 4]
-                grid_line_color: white
+                grid_line_color: "#DDDDDD"
     """, Loader=yaml.FullLoader))
-    
+
     return p
 
 @app.route('/')
