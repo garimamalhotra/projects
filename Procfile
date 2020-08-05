@@ -1,1 +1,1 @@
-web: bokeh serve --show app2.py
+web: bokeh serve --show app.py
